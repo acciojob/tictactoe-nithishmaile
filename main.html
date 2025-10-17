@@ -158,9 +158,9 @@
 
         function checkWhoIsWinner(){
             for(let  pattern of winningPatterns){
-                const position1Value=boxes[pattern[0]].innerText
-                const position2Value=boxes[pattern[1]].innerText
-                const position3Value=boxes[pattern[2]].innerText
+                const position1Value=boxes[pattern[0]-1].innerText
+                const position2Value=boxes[pattern[1]-1].innerText
+                const position3Value=boxes[pattern[2]-1].innerText
 
                 if(position1Value !="" && position2Value!="" && position3Value!=""){
                     if(position1Value==position2Value && position2Value==position3Value){
