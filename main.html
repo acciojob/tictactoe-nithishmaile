@@ -1,16 +1,231 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tic-tac-toe</title>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items:center;
+            margin: 0;
+            padding: 0;
+            height:100vh;
+            width:100vw;
+        }
+
+        .myForm{
+            display:flex;
+            flex-direction: column;
+            width:40%;
+        }
+
+        input{
+            margin-bottom: 15px;
+            margin-top:5px;
+            padding:10px;
+            font-size:larger;
+        }
+        #game-board{
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            grid-template-rows: repeat(3,1fr);
+            background-color: #FFC0CB;
+            height:500px;
+            width:500px;
+        }
+
+        label{
+            font-size: larger;
+        }
+        .game-board-container{
+            padding:500px 0px 500px 0px;
+            height:100vh;
+            width:100vw;
+            flex-direction: column;
+            justify-items: center;
+            align-content: center;
+
+        }
+
+        .box{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border:1px solid black;
+            align-items:center;
+            font-size: 80px;
+            cursor: pointer;
+        }
+
+        h1{
+            font-size: 60px;
+            text-align: center;
+        }
+
+        .message{
+            height:60px;
+            width:90%;
+            font-size: 60px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #buttons{
+            margin-top: 40px;
+        }
+        #reset{
+            height:40px;
+            width:100px;
+            font-size: 30px;
+            font-family: "Roboto";
+            border-radius: 5px;
+        }
+        #new-game{
+            height:40px;
+            width:180px;
+            font-size: 30px;
+            font-family: "Roboto";
+            border-radius: 5px;
+            color:white;
+            border-width: 0px;
+            background-color: green;
+            margin-right: 15px;
+        }
+        .hide{
+            display:none;
+        }
+
+    </style>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
+    <form class="myForm">
+        <h1 >Tic Tac Toe</h1>
+        <label for="player-1">Player 1</label>
+        <input id="player-1" type="text" placeholder="enter name" required/>
+        <label for="player-2">Player 2</label>
+        <input id="player-2" type="text" placeholder="enter name" required/>
+        <input type="submit" value="Start Game" id="submit" />
+    </form>
+    <div class="game-board-container hide">
+        <h1>Tic Tac Toe</h1>
+        <div class="message"></div>
+        <div  id="game-board">
 
+        </div>
+        <div id="buttons" >
+            <button id="new-game" type="button">New Game</button>
+            <button id="reset" type="button">Reset</button>
+        </div>
+    </div>
+    <script>
+        const myForm=document.querySelector(".myForm");
+        const gameBoard=document.getElementById("game-board");
+        const gameBoardContainer=document.querySelector(".game-board-container");
+        const message=document.querySelector(".message");
+        const reset=document.getElementById("reset");
+        const newGame=document.getElementById("new-game");
+        let player1Clicked=true;
+        let gameover=false;
+        const winningPatterns=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+
+        myForm.addEventListener("submit",submitThePlayerName);
+
+        message.textContent=player1Clicked && gameover==false?`${localStorage.getItem("player1")}, you're up`:`${localStorage.getItem("player2")}, you're up`
+
+        function submitThePlayerName(e){
+            e.preventDefault()
+            const player1=e.target[0].value;
+            const player2=e.target[1].value;
+            localStorage.setItem("player1",player1)
+            localStorage.setItem("player2",player2)
+            myForm.classList.toggle("hide");
+            gameBoardContainer.classList.toggle("hide")
+            message.textContent=`${localStorage.getItem("player1")}, you're up`
+
+        }
+
+        const tempDom=document.createDocumentFragment()
+
+        function changeTheBackGroundColorOfWinner(pattern){
+            pattern.forEach(element => {
+                document.getElementById(element).style.backgroundColor="green"
+            });
+        }
+
+
+
+        function checkWhoIsWinner(){
+            for(let  pattern of winningPatterns){
+                const position1Value=boxes[pattern[0]].innerText
+                const position2Value=boxes[pattern[1]].innerText
+                const position3Value=boxes[pattern[2]].innerText
+
+                if(position1Value !="" && position2Value!="" && position3Value!=""){
+                    if(position1Value==position2Value && position2Value==position3Value){
+                        message.textContent=position1Value=="X"?`${localStorage.getItem("player1")}, congratulations you won!`:`${localStorage.getItem("player2")}, congratulations you won!`
+                        changeTheBackGroundColorOfWinner(pattern);
+                        boxes.forEach((box)=>{
+                            box.style.pointerEvents="none";
+                        })
+                        gameover=true
+                    }
+                }
+            }
+        }
+
+        function createBoxes(id){
+            const div=document.createElement("div");
+            div.id=id;
+            div.classList.add("box");
+            div.addEventListener("click",(e)=>{
+                if(player1Clicked){
+                    div.textContent="X"
+                    player1Clicked=false;
+                    div.style.pointerEvents="none";
+                    checkWhoIsWinner() 
+                }else{
+                    div.textContent="O"
+                    player1Clicked=true;
+                    div.style.pointerEvents="none";
+                    checkWhoIsWinner()
+                }
+                if(!gameover){
+                    message.textContent=player1Clicked?`${localStorage.getItem("player1")}, you're up`:`${localStorage.getItem("player2")}, you're up`
+                }
+            })
+            tempDom.appendChild(div);
+        }
+
+        //let row=1;
+        //let column=1;
+
+        for(let i=0;i<9;i++){
+            /*let id=`R${row}-C${column}`;
+
+            if(i%3==0){
+                row++
+                column=0
+            }
+            column++*/
+            createBoxes(i)
+        }
+
+        gameBoard.appendChild(tempDom);
+
+        const boxes=document.querySelectorAll(".box");
+
+        function onReset(){
+            myForm.classList.toggle("hide");
+            gameBoardContainer.classList.toggle("hide")
+            myForm.reset()
+            localStorage.clear()
+            window.reload()
+        }
+
+        reset.addEventListener("click",onReset)
+
+    </script>
 </body>
-
 </html>
